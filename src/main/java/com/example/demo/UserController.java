@@ -26,7 +26,7 @@ public class UserController {
         return "test";
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/adasasda/{id}")
     @ResponseBody
     public User getUser(@PathVariable int id) {
         for (User user : userList) {
