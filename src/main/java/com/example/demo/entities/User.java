@@ -1,7 +1,6 @@
 package com.example.demo.entities;
 
 import java.sql.Date;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,23 +12,27 @@ import jakarta.persistence.Table;
 @Table(name = "users")
 public class User {
 	
+	/*
+	 * 
+	 * @param id identificadore de usuario
+	 */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+    /**
+     * El metodo
+     * @param id
+     */
     private String name;
+    
     private String lastname;
     private String password;
     private Date created_at;
     
-    
-    
-    
+ 
 	public User() {
-		super();
 	}
 	public User(Long id, String name, String lastname, String password, Date created_at) {
-		super();
 		this.id = id;
 		this.name = name;
 		this.lastname = lastname;

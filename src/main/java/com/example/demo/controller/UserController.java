@@ -1,84 +1,44 @@
 package com.example.demo.controller;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import com.example.demo.entities.User;
-import com.example.demo.services.IUserRepository;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import com.example.demo.services.UserService;
 
 @RestController
+@RequestMapping("/users")
 public class UserController {
 
-	private List<User> userList;
+    @Autowired
+    private UserService userService;
 
-	// datos
-	@Autowired
-	private IUserRepository repositoryUser;
+    @GetMapping
+    public ResponseEntity<Iterable<User>> findAll() {
+        Iterable<User> users = userService.findAllUsers();
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
 
-	// Listar todos los datos
-	@GetMapping("/users")
-	@ResponseBody
-	public Iterable<User> findAll() {
-		return repositoryUser.findAll();
-	}
+    @GetMapping("/{id}")
+    public ResponseEntity<User> findById(@PathVariable Long id) {
+        return userService.findUserById(id)
+                .map(user -> ResponseEntity.ok().body(user))
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
 
-	@GetMapping("/users/{id}")
-	@ResponseBody
-	public Optional<User> findById(@PathVariable Long id) {
+    @PostMapping
+    public ResponseEntity<?> createUser(@RequestBody User entity) {
+        try {
+            User createdUser = userService.createUser(entity);
+            return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error al procesar la solicitud: " + e.getMessage());
+        }
+    }
 
-		User user = repositoryUser.findAll();
-
-		for (User u : userList) {
-			if (user.getId() == id) {
-				return user.;
-			}
-		}
-		return null;
-	}
-
-	@PostMapping("/users")
-	public String setUsers(@RequestBody User entity) {
-		repositoryUser.save(entity);
-
-		return "Usuario creado";
-	}
-
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUserById(@PathVariable Long id) {
+        return userService.deleteUserById(id);
+    }
 }
-
-/*
- * 
- * 
- * //LEER DATOS POR ID // @GetMapping("/users/{id}") // @ResponseBody // public
- * User getUser(@PathVariable int id) { // for (User user : userList) { // if
- * (user.getId() == id) { // return user; // } // } // return null; // }
- * 
- * 
- * @PostMapping("/users") public String setUsers(@RequestBody User entity) {
- * userList.add(entity);
- * 
- * return "Usuario creado"; }
- * 
- * // @PutMapping("/users/{id}") // defin ruta {id} // public String
- * updateUser(@PathVariable int id, @RequestBody User updatedUser) { // for
- * (User user : userList) { // if (user.getId() == id) { // busca usuario por id
- * // // actualiza el usuario // user.setName(updatedUser.getName()); //
- * user.setEmail(updatedUser.getEmail()); // // return
- * "Usuario actualizado exitosamente"; // } // } return "Usuario no encontrado";
- * // si usuario no esta }
- * 
- * // @DeleteMapping("/users/{id}") // public String deleteUser(@PathVariable
- * int id) { // for (User user : userList) { // if (user.getId() == id) { //
- * busca id // userList.remove(user); // elimina usuario // return
- * "Usuario eliminado exitosamente"; // } // } // return
- * "Usuario no encontrado"; // si usuario no esta // } }
- */
